@@ -1,0 +1,24 @@
+curl -X POST http://172.16.1.30:8000/train_job \
+  -F 'config={"feature":["requests"]}' \
+  -F "train_file=@./send/train.parquet" \
+  -F "val_file=@./send/val.parquet" \
+  -F "test_file=@./send/test.parquet"
+
+# Log the trained ARIMA model to MLflow
+# python -m app.log_arima_mlflow --job-dir ./job/job_<job_id>
+
+# Serve with MLflow
+# mlflow models serve -m runs:/<run_id>/arima_live_model -p 5001 --no-conda
+
+# Example prediction request to MLflow serving
+# curl -X POST http://127.0.0.1:5001/invocations \
+#   -H "Content-Type: application/json" \
+#   -d '{
+#     "dataframe_records": [
+#       {
+#         "live_data": [101, 105, 99, 110],
+#         "horizon": 5,
+#         "update_history": true
+#       }
+#     ]
+#   }'
